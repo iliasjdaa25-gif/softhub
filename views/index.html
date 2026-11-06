@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoftHub - Everything You Need, One Click Away</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Header / Navbar -->
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo">
+        <i class="fas fa-cube"></i>
+        <span>Soft<span class="accent">Hub</span></span>
+      </a>
+      <p class="tagline">Everything You Need, One Click Away</p>
+      <div class="header-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search software...">
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <h1>Download the Best Software</h1>
+      <p>Browse our curated collection of top-quality programs. Fast, safe, and always up to date.</p>
+      <div class="hero-stats" id="heroStats">
+        <div class="stat">
+          <span class="stat-number" id="totalCount">0</span>
+          <span class="stat-label">Programs</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" id="catCount">0</span>
+          <span class="stat-label">Categories</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Free</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Filter -->
+  <section class="categories-section">
+    <div class="container">
+      <div class="categories-bar" id="categoriesBar">
+        <button class="cat-btn active" data-category="All">
+          <i class="fas fa-th-large"></i> All
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programs Grid -->
+  <main class="main-content">
+    <div class="container">
+      <div class="section-header">
+        <h2 id="sectionTitle">All Programs</h2>
+        <span class="result-count" id="resultCount"></span>
+      </div>
+      <div class="programs-grid" id="programsGrid">
+        <!-- Programs loaded dynamically -->
+      </div>
+      <div class="loading" id="loading" style="display:none;">
+        <div class="spinner"></div>
+        <p>Loading programs...</p>
+      </div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <i class="fas fa-box-open"></i>
+        <h3>No programs found</h3>
+        <p>Try a different search or category</p>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="/" class="logo">
+            <i class="fas fa-cube"></i>
+            <span>Soft<span class="accent">Hub</span></span>
+          </a>
+          <p>Everything You Need, One Click Away</p>
+        </div>
+        <div class="footer-links">
+          <a href="/login"><i class="fas fa-lock"></i> Admin</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 SoftHub. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

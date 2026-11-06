@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - SoftHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-page">
+
+  <!-- Admin Header -->
+  <header class="admin-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <i class="fas fa-cube"></i>
+        <span>Soft<span class="accent">Hub</span></span>
+        <span class="admin-badge">ADMIN</span>
+      </a>
+      <div class="admin-nav">
+        <a href="/" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-external-link-alt"></i> View Site</a>
+        <button onclick="logout()" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <nav>
+        <button class="sidebar-btn active" onclick="showSection('dashboard')">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="sidebar-btn" onclick="showSection('programs')">
+          <i class="fas fa-box"></i> Programs
+        </button>
+        <button class="sidebar-btn" onclick="showSection('add-program')">
+          <i class="fas fa-plus-circle"></i> Add Program
+        </button>
+        <button class="sidebar-btn" onclick="showSection('categories')">
+          <i class="fas fa-tags"></i> Categories
+        </button>
+        <button class="sidebar-btn" onclick="showSection('settings')">
+          <i class="fas fa-cog"></i> Settings
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+      <!-- Dashboard Section -->
+      <section id="section-dashboard" class="admin-section active">
+        <h2><i class="fas fa-chart-pie"></i> Dashboard</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-box"></i></div>
+            <div class="stat-info">
+              <span class="stat-number" id="statPrograms">0</span>
+              <span class="stat-label">Total Programs</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-tags"></i></div>
+            <div class="stat-info">
+              <span class="stat-number" id="statCategories">0</span>
+              <span class="stat-label">Categories</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-clock"></i> Recent Programs</h3>
+          <div id="recentList" class="recent-list"></div>
+        </div>
+      </section>
+
+      <!-- Programs List Section -->
+      <section id="section-programs" class="admin-section">
+        <div class="section-top">
+          <h2><i class="fas fa-box"></i> All Programs</h2>
+          <button class="btn btn-primary" onclick="showSection('add-program')">
+            <i class="fas fa-plus"></i> Add New
+          </button>
+        </div>
+        <div class="admin-search">
+          <i class="fas fa-search"></i>
+          <input type="text" id="adminSearchInput" placeholder="Search programs..." oninput="loadAdminPrograms()">
+        </div>
+        <div class="programs-table-wrap">
+          <table class="programs-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Download Link</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="programsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Add / Edit Program Section -->
+      <section id="section-add-program" class="admin-section">
+        <h2 id="formTitle"><i class="fas fa-plus-circle"></i> Add New Program</h2>
+        <div class="card">
+          <form id="programForm" enctype="multipart/form-data">
+            <input type="hidden" id="editId" value="">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="progTitle">Title *</label>
+                <input type="text" id="progTitle" required placeholder="e.g. Visual Studio Code">
+              </div>
+              <div class="form-group">
+                <label for="progCategory">Category</label>
+                <select id="progCategory"></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="progDescription">Description</label>
+              <textarea id="progDescription" rows="3" placeholder="Brief description of the software..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="progDownload">Download Link *</label>
+              <input type="url" id="progDownload" required placeholder="https://example.com/download">
+            </div>
+            <div class="form-group">
+              <label for="progImage">Program Image</label>
+              <div class="file-upload">
+                <input type="file" id="progImage" accept="image/*" onchange="previewImage(this)">
+                <div class="file-upload-label" id="fileLabel">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <span>Click to upload image (JPG, PNG, WebP — max 5MB)</span>
+                </div>
+              </div>
+              <div id="imagePreview" class="image-preview" style="display:none;">
+                <img id="previewImg" src="" alt="Preview">
+                <button type="button" class="btn btn-sm btn-danger" onclick="clearImage()">
+                  <i class="fas fa-times"></i> Remove
+                </button>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i> Save Program
+              </button>
+              <button type="button" class="btn btn-outline" onclick="resetForm()">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section id="section-categories" class="admin-section">
+        <h2><i class="fas fa-tags"></i> Categories</h2>
+        <div class="card">
+          <form id="categoryForm" class="inline-form">
+            <input type="text" id="newCategory" placeholder="New category name..." required>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </form>
+          <div id="categoriesList" class="categories-manage-list"></div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="section-settings" class="admin-section">
+        <h2><i class="fas fa-cog"></i> Settings</h2>
+        <div class="card">
+          <h3>Change Password</h3>
+          <form id="passwordForm">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="currentPassword" required>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirmPassword" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-key"></i> Update Password
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Delete Confirm Modal -->
+  <div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+      <p>Are you sure you want to delete this program? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============ STATE ============
+    let currentSection = 'dashboard';
+    let editingId = null;
+
+    // ============ NAVIGATION ============
+    function showSection(name) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('section-' + name).classList.add('active');
+      event.target.closest('.sidebar-btn')?.classList.add('active');
+      currentSection = name;
+
+      if (name === 'dashboard') loadDashboard();
+      if (name === 'programs') loadAdminPrograms();
+      if (name === 'categories') loadAdminCategories();
+      if (name === 'add-program') loadCategoryOptions();
+    }
+
+    // ============ DASHBOARD ============
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        document.getElementById('statPrograms').textContent = data.totalPrograms;
+        document.getElementById('statCategories').textContent = data.totalCategories;
+
+        const list = document.getElementById('recentList');
+        if (data.recentPrograms.length === 0) {
+          list.innerHTML = '<p class="empty-text">No programs yet. Add your first one!</p>';
+        } else {
+          list.innerHTML = data.recentPrograms.map(p => `
+            <div class="recent-item">
+              <img src="${p.image || '/css/placeholder.svg'}" alt="${p.title}" class="recent-thumb">
+              <div class="recent-info">
+                <strong>${p.title}</strong>
+                <span class="tag">${p.category}</span>
+              </div>
+              <span class="recent-date">${new Date(p.created_at).toLocaleDateString()}</span>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        showToast('Failed to load dashboard', 'error');
+      }
+    }
+
+    // ============ PROGRAMS MANAGEMENT ============
+    async function loadAdminPrograms() {
+      const search = document.getElementById('adminSearchInput')?.value || '';
+      try {
+        const res = await fetch(`/api/programs?limit=100&search=${encodeURIComponent(search)}`);
+        const data = await res.json();
+        const tbody = document.getElementById('programsTableBody');
+
+        if (data.programs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-text">No programs found</td></tr>';
+        } else {
+          tbody.innerHTML = data.programs.map(p => `
+            <tr>
+              <td><img src="${p.image || '/css/placeholder.svg'}" alt="" class="table-thumb"></td>
+              <td><strong>${p.title}</strong>${p.description ? '<br><small>' + p.description.substring(0, 60) + '...</small>' : ''}</td>
+              <td><span class="tag">${p.category}</span></td>
+              <td><a href="${p.download_link}" target="_blank" class="link-preview">${p.download_link.substring(0, 40)}...</a></td>
+              <td>${new Date(p.created_at).toLocaleDateString()}</td>
+              <td class="actions-cell">
+                <button class="btn btn-sm btn-outline" onclick="editProgram(${p.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="deleteProgram(${p.id})"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        showToast('Failed to load programs', 'error');
+      }
+    }
+
+    // ============ ADD / EDIT PROGRAM ============
+    async function loadCategoryOptions() {
+      try {
+        const res = await fetch('/api/categories');
+        const cats = await res.json();
+        const select = document.getElementById('progCategory');
+        select.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      } catch (err) {}
+    }
+
+    document.getElementById('programForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('title', document.getElementById('progTitle').value);
+      formData.append('description', document.getElementById('progDescription').value);
+      formData.append('download_link', document.getElementById('progDownload').value);
+      formData.append('category', document.getElementById('progCategory').value);
+
+      const imageFile = document.getElementById('progImage').files[0];
+      if (imageFile) formData.append('image', imageFile);
+
+      const editId = document.getElementById('editId').value;
+      const url = editId ? `/api/programs/${editId}` : '/api/programs';
+      const method = editId ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, { method, body: formData });
+        if (res.ok) {
+          showToast(editId ? 'Program updated!' : 'Program added!', 'success');
+          resetForm();
+          showSection('programs');
+          document.querySelectorAll('.sidebar-btn')[1].classList.add('active');
+        } else {
+          const data = await res.json();
+          showToast(data.error || 'Failed to save', 'error');
+        }
+      } catch (err) {
+        showToast('Connection error', 'error');
+      }
+    });
+
+    async function editProgram(id) {
+      try {
+        const res = await fetch(`/api/programs?limit=100`);
+        const data = await res.json();
+        const program = data.programs.find(p => p.id === id);
+        if (!program) return;
+
+        await loadCategoryOptions();
+
+        document.getElementById('editId').value = program.id;
+        document.getElementById('progTitle').value = program.title;
+        document.getElementById('progDescription').value = program.description || '';
+        document.getElementById('progDownload').value = program.download_link;
+        document.getElementById('progCategory').value = program.category;
+        document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Program';
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update Program';
+
+        if (program.image) {
+          document.getElementById('imagePreview').style.display = 'flex';
+          document.getElementById('previewImg').src = program.image;
+        }
+
+        // Switch to add-program section
+        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('section-add-program').classList.add('active');
+      } catch (err) {
+        showToast('Failed to load program', 'error');
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('programForm').reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Program';
+      document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save Program';
+      document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('previewImg').src = e.target.result;
+          document.getElementById('imagePreview').style.display = 'flex';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function clearImage() {
+      document.getElementById('progImage').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    // ============ DELETE ============
+    let deleteId = null;
+    function deleteProgram(id) {
+      deleteId = id;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+      if (!deleteId) return;
+      try {
+        const res = await fetch(`/api/programs/${deleteId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Program deleted', 'success');
+          loadAdminPrograms();
+        } else {
+          showToast('Failed to delete', 'error');
+        }
+      } catch (err) {
+        showToast('Connection error', 'error');
+      }
+      closeModal();
+    });
+
+    function closeModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+      deleteId = null;
+    }
+
+    // ============ CATEGORIES ============
+    async function loadAdminCategories() {
+      try {
+        const res = await fetch('/api/categories');
+        const cats = await res.json();
+        const list = document.getElementById('categoriesList');
+        list.innerHTML = cats.map(c => `
+          <div class="category-item">
+            <span><i class="fas fa-tag"></i> ${c.name}</span>
+            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})"><i class="fas fa-trash"></i></button>
+          </div>
+        `).join('');
+      } catch (err) {
+        showToast('Failed to load categories', 'error');
+      }
+    }
+
+    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('newCategory').value.trim();
+      if (!name) return;
+
+      try {
+        const res = await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        if (res.ok) {
+          showToast('Category added!', 'success');
+          document.getElementById('newCategory').value = '';
+          loadAdminCategories();
+        }
+      } catch (err) {
+        showToast('Failed to add category', 'error');
+      }
+    });
+
+    async function deleteCategory(id) {
+      try {
+        await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+        showToast('Category deleted', 'success');
+        loadAdminCategories();
+      } catch (err) {
+        showToast('Failed to delete', 'error');
+      }
+    }
+
+    // ============ SETTINGS ============
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+        if (res.ok) {
+          showToast('Password updated!', 'success');
+          document.getElementById('passwordForm').reset();
+        } else {
+          const data = await res.json();
+          showToast(data.error || 'Failed to update password', 'error');
+        }
+      } catch (err) {
+        showToast('Connection error', 'error');
+      }
+    });
+
+    // ============ LOGOUT ============
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login';
+    }
+
+    // ============ TOAST ============
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => toast.className = 'toast', 3000);
+    }
+
+    // ============ INIT ============
+    loadDashboard();
+  </script>
+</body>
+</html>
