@@ -116,7 +116,13 @@
               <input type="url" id="progDownload" required placeholder="https://example.com/download">
             </div>
             <div class="form-group">
-              <label for="progImage">Program Image</label>
+              <label for="progImage">Program Image (Upload File OR Image URL)</label>
+              <div class="form-row" style="margin-bottom: 12px;">
+                <div style="flex:1;">
+                  <input type="url" id="progImageUrl" placeholder="Paste image link here (e.g. from ImgBB, Postimages, Google...)">
+                </div>
+              </div>
+              <div style="text-align: center; color: var(--text-dim); margin-bottom: 10px; font-size: 12px; font-weight: 600;">— OR UPLOAD FROM DEVICE —</div>
               <div class="file-upload">
                 <input type="file" id="progImage" accept="image/*" onchange="previewImage(this)">
                 <div class="file-upload-label" id="fileLabel">
@@ -277,6 +283,9 @@
       formData.append('description', document.getElementById('progDescription').value);
       formData.append('download_link', document.getElementById('progDownload').value);
 
+      const imageUrl = document.getElementById('progImageUrl').value.trim();
+      if (imageUrl) formData.append('image_url', imageUrl);
+
       const imageFile = document.getElementById('progImage').files[0];
       if (imageFile) formData.append('image', imageFile);
 
@@ -315,6 +324,9 @@
         document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update Program';
 
         if (program.image) {
+          if (program.image.startsWith('http://') || program.image.startsWith('https://')) {
+            document.getElementById('progImageUrl').value = program.image;
+          }
           document.getElementById('imagePreview').style.display = 'flex';
           document.getElementById('previewImg').src = program.image;
         }
@@ -330,6 +342,7 @@
     function resetForm() {
       document.getElementById('programForm').reset();
       document.getElementById('editId').value = '';
+      document.getElementById('progImageUrl').value = '';
       document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Program';
       document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save Program';
       document.getElementById('imagePreview').style.display = 'none';
@@ -337,6 +350,7 @@
 
     function previewImage(input) {
       if (input.files && input.files[0]) {
+        document.getElementById('progImageUrl').value = '';
         const reader = new FileReader();
         reader.onload = (e) => {
           document.getElementById('previewImg').src = e.target.result;
@@ -346,8 +360,18 @@
       }
     }
 
+    document.getElementById('progImageUrl').addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        document.getElementById('progImage').value = '';
+        document.getElementById('previewImg').src = val;
+        document.getElementById('imagePreview').style.display = 'flex';
+      }
+    });
+
     function clearImage() {
       document.getElementById('progImage').value = '';
+      document.getElementById('progImageUrl').value = '';
       document.getElementById('imagePreview').style.display = 'none';
     }
 

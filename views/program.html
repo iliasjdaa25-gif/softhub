@@ -261,7 +261,7 @@
 
         const imgBox = document.getElementById('detailImageBox');
         if (program.image) {
-          imgBox.innerHTML = `<img src="${program.image}" alt="${program.title}">`;
+          imgBox.innerHTML = `<img src="${program.image}" alt="${program.title}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fas fa-cube\\'></i>';">`;
         } else {
           imgBox.innerHTML = `<i class="fas fa-cube"></i>`;
         }

@@ -163,8 +163,11 @@ app.get('/api/auth/check', (req, res) => {
 // ============ ADMIN CRUD ============
 app.post('/api/programs', requireAdmin, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, download_link, category } = req.body;
-    const image = req.file ? '/uploads/' + req.file.filename : null;
+    const { title, description, download_link, category, image_url } = req.body;
+    let image = image_url || null;
+    if (req.file) {
+      image = '/uploads/' + req.file.filename;
+    }
 
     const result = await runSql(
       'INSERT INTO programs (title, description, image, download_link, category) VALUES (?, ?, ?, ?, ?)',
@@ -180,14 +183,14 @@ app.post('/api/programs', requireAdmin, upload.single('image'), async (req, res)
 
 app.put('/api/programs/:id', requireAdmin, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, download_link, category } = req.body;
+    const { title, description, download_link, category, image_url } = req.body;
     const existing = await queryOne('SELECT * FROM programs WHERE id = ?', [parseInt(req.params.id)]);
 
     if (!existing) return res.status(404).json({ error: 'Program not found' });
 
-    let image = existing.image;
+    let image = image_url !== undefined && image_url !== '' ? image_url : existing.image;
     if (req.file) {
-      if (existing.image) {
+      if (existing.image && existing.image.startsWith('/uploads/')) {
         const oldPath = path.join(__dirname, 'public', existing.image);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }

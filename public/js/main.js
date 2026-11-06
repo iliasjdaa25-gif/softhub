@@ -63,7 +63,7 @@ async function loadPrograms() {
       <div class="program-card" onclick="window.location.href='/program?id=${p.id}'" style="cursor: pointer;">
         <div class="card-image">
           ${p.image 
-            ? `<img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy">` 
+            ? `<img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'placeholder-icon\\'><i class=\\'fas fa-cube\\'></i></span>';">` 
             : `<span class="placeholder-icon"><i class="fas fa-cube"></i></span>`
           }
         </div>
