@@ -59,6 +59,10 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
+app.get('/program', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'program.html'));
+});
+
 app.get('/admin', (req, res) => {
   if (!req.session || !req.session.isAdmin) return res.redirect('/login');
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
@@ -105,6 +109,16 @@ app.get('/api/programs', async (req, res) => {
       page: parseInt(page),
       totalPages: Math.ceil((countResult ? countResult.total : 0) / parseInt(limit))
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/programs/:id', async (req, res) => {
+  try {
+    const program = await queryOne('SELECT * FROM programs WHERE id = ?', [parseInt(req.params.id)]);
+    if (!program) return res.status(404).json({ error: 'Program not found' });
+    res.json(program);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

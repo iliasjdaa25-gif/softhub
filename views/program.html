@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Software Details - SoftHub</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+  <link rel="shortcut icon" href="/favicon.ico?v=2">
+  <link rel="apple-touch-icon" href="/favicon.png?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .program-detail-wrap {
+      padding: 50px 0 80px;
+    }
+    .back-btn-row {
+      margin-bottom: 25px;
+    }
+    .detail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 35px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 40px;
+    }
+    .detail-image-box {
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--bg-card-hover);
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+    }
+    .detail-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .detail-image-box i {
+      font-size: 80px;
+      color: var(--text-dim);
+    }
+    .detail-content {
+      display: flex;
+      flex-direction: column;
+    }
+    .detail-header-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .detail-title {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 15px;
+      color: var(--text);
+    }
+    .detail-date {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .detail-desc-box {
+      margin: 20px 0 30px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      flex: 1;
+    }
+    .detail-desc-box h4 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--primary-light);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .detail-desc-text {
+      color: var(--text-muted);
+      line-height: 1.8;
+      white-space: pre-wrap;
+      font-size: 15px;
+    }
+    .detail-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-download-big {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+      transition: var(--transition);
+    }
+    .btn-download-big:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+      color: #fff;
+    }
+    .detail-safety-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    @media (max-width: 860px) {
+      .detail-card {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+      .detail-image-box {
+        height: 240px;
+      }
+      .detail-title {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Navbar -->
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="/logo.png" alt="SoftHub Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;">
+        <span>Soft<span class="accent">Hub</span></span>
+      </a>
+      <p class="tagline">Everything You Need, One Click Away</p>
+      <div class="header-search">
+        <a href="/" class="btn btn-outline btn-sm"><i class="fas fa-home"></i> Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="program-detail-wrap">
+    <div class="container">
+      <div class="back-btn-row">
+        <a href="/" class="btn btn-outline btn-sm">
+          <i class="fas fa-arrow-left"></i> All Programs
+        </a>
+      </div>
+
+      <div id="loadingDetail" class="loading">
+        <div class="spinner"></div>
+        <p>Loading program details...</p>
+      </div>
+
+      <div id="errorDetail" class="empty-state" style="display:none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <h3>Program Not Found</h3>
+        <p>The program you're looking for doesn't exist or has been removed.</p>
+        <a href="/" class="btn btn-primary" style="margin-top: 15px;"><i class="fas fa-arrow-left"></i> Return to Homepage</a>
+      </div>
+
+      <div id="programDetailCard" class="detail-card" style="display:none;">
+        <div class="detail-image-box" id="detailImageBox">
+          <!-- Image or placeholder -->
+        </div>
+
+        <div class="detail-content">
+          <div class="detail-header-meta">
+            <span class="tag" id="detailCategory">General</span>
+            <span class="detail-date" id="detailDate"></span>
+          </div>
+
+          <h1 class="detail-title" id="detailTitle"></h1>
+
+          <div class="detail-desc-box">
+            <h4><i class="fas fa-align-left"></i> Description & Overview</h4>
+            <div class="detail-desc-text" id="detailDescription"></div>
+          </div>
+
+          <div class="detail-actions">
+            <a href="#" id="detailDownloadBtn" target="_blank" rel="noopener" class="btn-download-big">
+              <i class="fas fa-download"></i> Download Now
+            </a>
+            <span class="detail-safety-badge">
+              <i class="fas fa-shield-alt"></i> Verified Safe & Clean Link
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="/" class="logo">
+            <img src="/logo.png" alt="SoftHub Logo" style="width: 28px; height: 28px; border-radius: 6px; object-fit: cover;">
+            <span>Soft<span class="accent">Hub</span></span>
+          </a>
+          <p>Everything You Need, One Click Away</p>
+        </div>
+        <div class="footer-links">
+          <a href="/login"><i class="fas fa-lock"></i> Admin</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 SoftHub. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      const loader = document.getElementById('loadingDetail');
+      const errBox = document.getElementById('errorDetail');
+      const card = document.getElementById('programDetailCard');
+
+      if (!id) {
+        loader.style.display = 'none';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/programs/${id}`);
+        if (!res.ok) throw new Error('Not found');
+
+        const program = await res.json();
+        loader.style.display = 'none';
+        card.style.display = 'grid';
+
+        document.getElementById('pageTitle').textContent = `${program.title} - Download on SoftHub`;
+        document.getElementById('detailTitle').textContent = program.title;
+        document.getElementById('detailCategory').textContent = program.category || 'General';
+        document.getElementById('detailDescription').textContent = program.description || 'No detailed description provided for this software.';
+        document.getElementById('detailDownloadBtn').href = program.download_link;
+
+        if (program.created_at) {
+          const d = new Date(program.created_at);
+          document.getElementById('detailDate').textContent = `Added on ${d.toLocaleDateString()}`;
+        }
+
+        const imgBox = document.getElementById('detailImageBox');
+        if (program.image) {
+          imgBox.innerHTML = `<img src="${program.image}" alt="${program.title}">`;
+        } else {
+          imgBox.innerHTML = `<i class="fas fa-cube"></i>`;
+        }
+
+      } catch (err) {
+        loader.style.display = 'none';
+        errBox.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

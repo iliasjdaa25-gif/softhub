@@ -116,20 +116,20 @@ async function loadPrograms() {
     }
 
     grid.innerHTML = data.programs.map(p => `
-      <div class="program-card">
+      <div class="program-card" onclick="window.location.href='/program?id=${p.id}'" style="cursor: pointer;">
         <div class="card-image">
           ${p.image 
-            ? `<img src="${p.image}" alt="${p.title}" loading="lazy">` 
+            ? `<img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy">` 
             : `<span class="placeholder-icon"><i class="fas fa-cube"></i></span>`
           }
         </div>
         <div class="card-body">
-          <h3>${escapeHtml(p.title)}</h3>
+          <h3><a href="/program?id=${p.id}" class="card-title-link">${escapeHtml(p.title)}</a></h3>
           <p>${escapeHtml(p.description || 'No description available.')}</p>
           <div class="card-footer">
             <span class="tag">${escapeHtml(p.category)}</span>
-            <a href="${escapeHtml(p.download_link)}" target="_blank" rel="noopener" class="download-btn">
-              <i class="fas fa-download"></i> Download
+            <a href="/program?id=${p.id}" class="download-btn" onclick="event.stopPropagation();">
+              <i class="fas fa-eye"></i> View & Download
             </a>
           </div>
         </div>
