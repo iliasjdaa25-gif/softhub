@@ -1,12 +1,10 @@
 // ============ STATE ============
-let currentCategory = 'All';
 let currentPage = 1;
 let currentSearch = '';
 let searchTimeout = null;
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
-  loadCategories();
   loadPrograms();
   setupSearch();
 });
@@ -26,59 +24,6 @@ function setupSearch() {
   });
 }
 
-// ============ CATEGORIES ============
-async function loadCategories() {
-  try {
-    const res = await fetch('/api/categories');
-    const categories = await res.json();
-    const bar = document.getElementById('categoriesBar');
-    if (!bar) return;
-
-    const catCount = document.getElementById('catCount');
-    if (catCount) catCount.textContent = categories.length;
-
-    bar.innerHTML = `
-      <button class="cat-btn active" data-category="All" onclick="filterCategory('All', this)">
-        <i class="fas fa-th-large"></i> All
-      </button>
-      ${categories.map(c => `
-        <button class="cat-btn" data-category="${c.name}" onclick="filterCategory('${c.name}', this)">
-          ${getCategoryIcon(c.name)} ${c.name}
-        </button>
-      `).join('')}
-    `;
-  } catch (err) {
-    console.error('Failed to load categories:', err);
-  }
-}
-
-function getCategoryIcon(name) {
-  const icons = {
-    'General': '<i class="fas fa-box"></i>',
-    'Utilities': '<i class="fas fa-tools"></i>',
-    'Development': '<i class="fas fa-code"></i>',
-    'Design': '<i class="fas fa-palette"></i>',
-    'Security': '<i class="fas fa-shield-alt"></i>',
-    'Media': '<i class="fas fa-play-circle"></i>',
-    'Games': '<i class="fas fa-gamepad"></i>',
-    'Education': '<i class="fas fa-graduation-cap"></i>',
-  };
-  return icons[name] || '<i class="fas fa-tag"></i>';
-}
-
-function filterCategory(category, btn) {
-  currentCategory = category;
-  currentPage = 1;
-
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-
-  const title = document.getElementById('sectionTitle');
-  if (title) title.textContent = category === 'All' ? 'All Programs' : category;
-
-  loadPrograms();
-}
-
 // ============ LOAD PROGRAMS ============
 async function loadPrograms() {
   const grid = document.getElementById('programsGrid');
@@ -96,7 +41,6 @@ async function loadPrograms() {
     const params = new URLSearchParams({
       page: currentPage,
       limit: 12,
-      category: currentCategory,
       search: currentSearch,
     });
 
@@ -126,8 +70,7 @@ async function loadPrograms() {
         <div class="card-body">
           <h3><a href="/program?id=${p.id}" class="card-title-link">${escapeHtml(p.title)}</a></h3>
           <p>${escapeHtml(p.description || 'No description available.')}</p>
-          <div class="card-footer">
-            <span class="tag">${escapeHtml(p.category)}</span>
+          <div class="card-footer" style="justify-content: flex-end;">
             <a href="/program?id=${p.id}" class="download-btn" onclick="event.stopPropagation();">
               <i class="fas fa-eye"></i> View & Download
             </a>

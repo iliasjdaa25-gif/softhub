@@ -42,9 +42,6 @@
         <button class="sidebar-btn" onclick="showSection('add-program')">
           <i class="fas fa-plus-circle"></i> Add Program
         </button>
-        <button class="sidebar-btn" onclick="showSection('categories')">
-          <i class="fas fa-tags"></i> Categories
-        </button>
         <button class="sidebar-btn" onclick="showSection('settings')">
           <i class="fas fa-cog"></i> Settings
         </button>
@@ -63,13 +60,6 @@
             <div class="stat-info">
               <span class="stat-number" id="statPrograms">0</span>
               <span class="stat-label">Total Programs</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon green"><i class="fas fa-tags"></i></div>
-            <div class="stat-info">
-              <span class="stat-number" id="statCategories">0</span>
-              <span class="stat-label">Categories</span>
             </div>
           </div>
         </div>
@@ -97,7 +87,6 @@
               <tr>
                 <th>Image</th>
                 <th>Title</th>
-                <th>Category</th>
                 <th>Download Link</th>
                 <th>Date</th>
                 <th>Actions</th>
@@ -114,15 +103,9 @@
         <div class="card">
           <form id="programForm" enctype="multipart/form-data">
             <input type="hidden" id="editId" value="">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="progTitle">Title *</label>
-                <input type="text" id="progTitle" required placeholder="e.g. Visual Studio Code">
-              </div>
-              <div class="form-group">
-                <label for="progCategory">Category</label>
-                <select id="progCategory"></select>
-              </div>
+            <div class="form-group">
+              <label for="progTitle">Title *</label>
+              <input type="text" id="progTitle" required placeholder="e.g. Visual Studio Code">
             </div>
             <div class="form-group">
               <label for="progDescription">Description</label>
@@ -157,20 +140,6 @@
               </button>
             </div>
           </form>
-        </div>
-      </section>
-
-      <!-- Categories Section -->
-      <section id="section-categories" class="admin-section">
-        <h2><i class="fas fa-tags"></i> Categories</h2>
-        <div class="card">
-          <form id="categoryForm" class="inline-form">
-            <input type="text" id="newCategory" placeholder="New category name..." required>
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-plus"></i> Add
-            </button>
-          </form>
-          <div id="categoriesList" class="categories-manage-list"></div>
         </div>
       </section>
 
@@ -242,7 +211,6 @@
         const res = await fetch('/api/stats');
         const data = await res.json();
         document.getElementById('statPrograms').textContent = data.totalPrograms;
-        document.getElementById('statCategories').textContent = data.totalCategories;
 
         const list = document.getElementById('recentList');
         if (data.recentPrograms.length === 0) {
@@ -253,7 +221,6 @@
               <img src="${p.image || '/css/placeholder.svg'}" alt="${p.title}" class="recent-thumb">
               <div class="recent-info">
                 <strong>${p.title}</strong>
-                <span class="tag">${p.category}</span>
               </div>
               <span class="recent-date">${new Date(p.created_at).toLocaleDateString()}</span>
             </div>
@@ -279,7 +246,6 @@
             <tr>
               <td><img src="${p.image || '/css/placeholder.svg'}" alt="" class="table-thumb"></td>
               <td><strong>${p.title}</strong>${p.description ? '<br><small>' + p.description.substring(0, 60) + '...</small>' : ''}</td>
-              <td><span class="tag">${p.category}</span></td>
               <td><a href="${p.download_link}" target="_blank" class="link-preview">${p.download_link.substring(0, 40)}...</a></td>
               <td>${new Date(p.created_at).toLocaleDateString()}</td>
               <td class="actions-cell">
@@ -310,7 +276,6 @@
       formData.append('title', document.getElementById('progTitle').value);
       formData.append('description', document.getElementById('progDescription').value);
       formData.append('download_link', document.getElementById('progDownload').value);
-      formData.append('category', document.getElementById('progCategory').value);
 
       const imageFile = document.getElementById('progImage').files[0];
       if (imageFile) formData.append('image', imageFile);
@@ -342,13 +307,10 @@
         const program = data.programs.find(p => p.id === id);
         if (!program) return;
 
-        await loadCategoryOptions();
-
         document.getElementById('editId').value = program.id;
         document.getElementById('progTitle').value = program.title;
         document.getElementById('progDescription').value = program.description || '';
         document.getElementById('progDownload').value = program.download_link;
-        document.getElementById('progCategory').value = program.category;
         document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Program';
         document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update Program';
 
@@ -415,54 +377,6 @@
     function closeModal() {
       document.getElementById('deleteModal').style.display = 'none';
       deleteId = null;
-    }
-
-    // ============ CATEGORIES ============
-    async function loadAdminCategories() {
-      try {
-        const res = await fetch('/api/categories');
-        const cats = await res.json();
-        const list = document.getElementById('categoriesList');
-        list.innerHTML = cats.map(c => `
-          <div class="category-item">
-            <span><i class="fas fa-tag"></i> ${c.name}</span>
-            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})"><i class="fas fa-trash"></i></button>
-          </div>
-        `).join('');
-      } catch (err) {
-        showToast('Failed to load categories', 'error');
-      }
-    }
-
-    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('newCategory').value.trim();
-      if (!name) return;
-
-      try {
-        const res = await fetch('/api/categories', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
-        });
-        if (res.ok) {
-          showToast('Category added!', 'success');
-          document.getElementById('newCategory').value = '';
-          loadAdminCategories();
-        }
-      } catch (err) {
-        showToast('Failed to add category', 'error');
-      }
-    });
-
-    async function deleteCategory(id) {
-      try {
-        await fetch(`/api/categories/${id}`, { method: 'DELETE' });
-        showToast('Category deleted', 'success');
-        loadAdminCategories();
-      } catch (err) {
-        showToast('Failed to delete', 'error');
-      }
     }
 
     // ============ SETTINGS ============
